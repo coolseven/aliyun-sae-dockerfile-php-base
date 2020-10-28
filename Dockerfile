@@ -1,17 +1,19 @@
-ARG PHP_VERSION=7-fpm-alpine
+ARG PHP_VERSION=7.4.11-fpm-alpine
 ARG COMPOSER_VERSION=2.0.2
 
 FROM composer:${COMPOSER_VERSION} as composer
 FROM php:${PHP_VERSION}
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+# https://github.com/mlocati/docker-php-extension-installer
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
 
-ARG ALPINE_URL=dl-cdn.alpinelinux.org
+ARG ALPINE_URL=mirrors.ustc.edu.cn
 ARG INSTALL_XDEBUG=false
 
 RUN sed -i "s:dl-cdn.alpinelinux.org:${ALPINE_URL}:g" /etc/apk/repositories \
-    && apk add --no-cache \
+    && apk add --verbose --no-cache \
        git \
        openssh \
     && install-php-extensions \
@@ -29,7 +31,10 @@ RUN sed -i "s:dl-cdn.alpinelinux.org:${ALPINE_URL}:g" /etc/apk/repositories \
          && docker-php-ext-enable xdebug \
        ;fi
 
-
 ENV TZ ${TZ:-Asia/Shanghai}
+
+RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+
+WORKDIR /app
 
 
