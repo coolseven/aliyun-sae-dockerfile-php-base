@@ -1,5 +1,5 @@
-ARG PHP_VERSION=7.4.11-fpm-alpine
-ARG COMPOSER_VERSION=2.0.2
+ARG PHP_VERSION=7.2.27-fpm-alpine3.11
+ARG COMPOSER_VERSION=2.0.4
 
 FROM composer:${COMPOSER_VERSION} as composer
 FROM php:${PHP_VERSION}
@@ -16,6 +16,7 @@ RUN sed -i "s:dl-cdn.alpinelinux.org:${ALPINE_URL}:g" /etc/apk/repositories \
     && apk add --verbose --no-cache \
        git \
        openssh \
+       zip \
     && install-php-extensions \
         bcmath \
         pcntl \
@@ -31,7 +32,7 @@ RUN sed -i "s:dl-cdn.alpinelinux.org:${ALPINE_URL}:g" /etc/apk/repositories \
          && docker-php-ext-enable xdebug \
        ;fi
 
-ENV TZ ${TZ:-Asia/Shanghai}
+ENV TZ Asia/Shanghai
 
 RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
